@@ -1,0 +1,59 @@
+syntax="proto2";
+package msg;
+
+option java_package = "com.kongyt.kengine.msg";
+
+enum EMsg{
+
+    // 注册
+    C2S_Register_Req_ID     = 0x0001;
+    S2C_Register_Res_ID     = 0x0002;
+
+    // 登陆
+    C2S_Login_Req_ID        = 0x0003;
+    S2C_Login_Res_ID        = 0x0004;
+    
+    // 登出
+    C2S_Logout_Req_ID       = 0x0005;
+    S2C_Logout_Res_ID       = 0x0006;
+    
+    // 角色信息
+    C2S_Role_Info_Req_ID    = 0x0007;   
+    S2C_Role_Info_Res_ID    = 0x0008;
+
+    
+}
+
+
+message C2S_Register_Req{
+    optional string userName    = 1;
+    optional string password    = 2;
+}
+
+message S2C_Register_Res{
+    optional bool result        = 1;
+    optional int32 errorCode    = 2;
+    optional string errorStr    = 3;
+}
+
+
+message C2S_Login_Req{
+    optional string userName    = 1;
+    optional string password    = 2;
+}
+
+message S2C_Login_Res{
+    optional bool result        = 1;
+    optional int32 errorCode    = 2;
+    optional string errorStr    = 3;
+}
+
+message C2S_Logout_Req{
+    // Empty Message
+}
+
+message S2C_Logout_Res{
+    optional bool result        = 1;
+    optional bool errorCode     = 2;
+    optional string errorStr    = 3;
+}
