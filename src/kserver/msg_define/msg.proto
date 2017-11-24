@@ -17,11 +17,21 @@ enum EMsg{
     C2S_Logout_Req_ID       = 0x0005;
     S2C_Logout_Res_ID       = 0x0006;
     
-    // 角色信息
-    C2S_Role_Info_Req_ID    = 0x0007;   
-    S2C_Role_Info_Res_ID    = 0x0008;
+    // 创建角色
+    C2S_Create_Char_Req_ID  = 0x0007;
+    S2C_Create_Char_Res_ID  = 0x0008;
 
+    // 进入游戏
+    C2S_Enter_World_Req_ID  = 0x0009;
+    S2C_Enter_World_Res_ID  = 0x000A;
     
+    // 移动
+    C2S_Move_To_Req_ID      = 0x000B;
+    S2C_Move_To_Res_ID      = 0x000C;
+    
+    // 广播消息
+    S2C_Player_Enter_World_Noti_ID  = 0x1001;
+    S2C_Player_Move_To_Noti_ID       = 0x1002;
 }
 
 
@@ -54,6 +64,35 @@ message C2S_Logout_Req{
 
 message S2C_Logout_Res{
     optional bool result        = 1;
-    optional bool errorCode     = 2;
+    optional int32 errorCode     = 2;
     optional string errorStr    = 3;
+}
+
+message C2S_Create_Char_Req{
+    optional int32 charType     = 1;
+    optional string roleName    = 2;
+}
+
+message S2C_Create_Char_Res{
+    optional bool result        = 1;
+    optional int32 errorCode    = 2;
+    optional string errorStr    = 3;
+    optional int32 roleId       = 4;
+    optional int32 charType     = 5;
+    optional string charName    = 6;
+}
+
+message C2S_Enter_World_Req{
+    optional int32 roleId       = 1;
+}
+
+message S2C_Enter_World_Res{
+    optional bool result        = 1;
+    optional int32  errorCode   = 2;
+    optional string errorStr    = 3;
+    optional int32 roleId       = 4;
+    optional int32 charType     = 5;
+    optional string roleName    = 6;
+    optional int32 posX        = 7;
+    optional int32 posY         = 8;
 }
