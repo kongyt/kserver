@@ -1,38 +1,60 @@
 syntax="proto2";
 package msg;
-
-option java_package = "com.kongyt.kengine.msg";
+option csharp_namespace="Pb";
 
 enum EMsg{
 
     // 注册
-    C2S_Register_Req_ID     = 0x0001;
-    S2C_Register_Res_ID     = 0x0002;
+    C2S_Register_Req_ID     = 0x00000001;
+    S2C_Register_Res_ID     = 0x00000002;
 
     // 登陆
-    C2S_Login_Req_ID        = 0x0003;
-    S2C_Login_Res_ID        = 0x0004;
+    C2S_Login_Req_ID        = 0x00000003;
+    S2C_Login_Res_ID        = 0x00000004;
     
     // 登出
-    C2S_Logout_Req_ID       = 0x0005;
-    S2C_Logout_Res_ID       = 0x0006;
+    C2S_Logout_Req_ID       = 0x00000005;
+    S2C_Logout_Res_ID       = 0x00000006;
     
     // 创建角色
-    C2S_Create_Char_Req_ID  = 0x0007;
-    S2C_Create_Char_Res_ID  = 0x0008;
+    C2S_Create_Char_Req_ID  = 0x00000007;
+    S2C_Create_Char_Res_ID  = 0x00000008;
 
     // 进入游戏
-    C2S_Enter_World_Req_ID  = 0x0009;
-    S2C_Enter_World_Res_ID  = 0x000A;
+    C2S_Enter_World_Req_ID  = 0x00000009;
+    S2C_Enter_World_Res_ID  = 0x0000000A;
+
+    // 同步角色
+    C2S_Sync_Player_Req_ID  = 0x0000000B;
+    S2C_Sync_Player_Res_ID  = 0x0000000C;
     
-    // 移动
-    C2S_Move_To_Req_ID      = 0x000B;
-    S2C_Move_To_Res_ID      = 0x000C;
+    // 更新位置
+    C2S_Move_Req_ID   = 0x0000000D;
     
     // 广播消息
-    S2C_Player_Enter_World_Noti_ID  = 0x1001;
-    S2C_Player_Move_To_Noti_ID       = 0x1002;
+    S2C_Broad_Cast_ID       = 0x0000FF00;
 }
+
+// 广播消息类型
+enum EBC{
+    Talk                    = 0x0001;
+    Sync                    = 0x0002;
+    Action                  = 0x0003;
+}
+
+// 基础消息类型
+message Player{
+    optional int32      pid     = 1;
+    optional Position   pos     = 2;
+}
+
+message Position{
+    optional float  X           = 1;
+    optional float  Y           = 2;
+    optional float  Z           = 3;
+    optional float  V           = 4;
+}
+
 
 
 message C2S_Register_Req{
@@ -83,16 +105,36 @@ message S2C_Create_Char_Res{
 }
 
 message C2S_Enter_World_Req{
-    optional int32 roleId       = 1;
+    optional int32 pid         = 1;
 }
 
 message S2C_Enter_World_Res{
     optional bool result        = 1;
     optional int32  errorCode   = 2;
     optional string errorStr    = 3;
-    optional int32 roleId       = 4;
-    optional int32 charType     = 5;
-    optional string roleName    = 6;
-    optional int32 posX        = 7;
-    optional int32 posY         = 8;
+    optional int32 pid          = 4;
 }
+
+message C2S_Sync_Player_Req{
+    optional int32  pid         = 1;
+}
+
+message S2C_Sync_Player_Res{
+    optional Player  player     = 1;
+}
+
+message C2S_Move_Req{
+    optional Position   pos     = 1;
+    optional int32      action  = 2;
+}
+
+message BroadCast{
+    optional int32  Pid = 1;
+    optional int32  Tp  = 2;
+    oneof  Data{
+        string      content         = 3;
+        Position    pos             = 4;
+        int32       action          = 5;
+    }
+}
+

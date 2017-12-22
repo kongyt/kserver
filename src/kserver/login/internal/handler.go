@@ -6,6 +6,8 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/kongyt/leaf/gate"
 	"github.com/kongyt/leaf/log"
+	"kserver/game"
+	"kserver/game/core"
 )
 
 func handleMsg(m interface{}, h interface{}){
@@ -36,9 +38,11 @@ func onLoginReq(args[] interface{}){
 
 	log.Debug("onLoginReq(%v, %v)",m.GetUserName(), m.GetPassword())
 
-	//game.ChanRPC.Go("AddPlayer", a, uint32(1))
+	core.WorldMgrObj.AddPlayer(a)
 
 	a.WriteMsg(&msg.S2C_Login_Res{
 		Result: proto.Bool(true),
 	})
+
+
 }
