@@ -1,0 +1,2 @@
+C:\mygo\client\WorldGame\obj\Debug\Assembly-CSharp-vs.csprojResolveAssemblyReference.cache
+C:\mygo\client\WorldGame\obj\Debug\Assembly-CSharp-vs.csproj.CoreCompileInputs.cache

@@ -8,6 +8,7 @@ It is generated from these files:
 	msg.proto
 
 It has these top-level messages:
+	Players
 	Player
 	Position
 	C2S_Register_Req
@@ -22,8 +23,16 @@ It has these top-level messages:
 	S2C_Enter_World_Res
 	C2S_Sync_Player_Req
 	S2C_Sync_Player_Res
-	C2S_Move_Req
-	BroadCast
+	C2S_Move_And_Action_Req
+	S2C_Move_And_Action_Res
+	C2S_Talk_Req
+	S2C_Talk_Res
+	S2C_Player_Talk_Noti
+	S2C_Player_Move_And_Action_Noti
+	S2C_Sync_Player_Noti
+	S2C_Sync_Players_Noti
+	S2C_Player_Leave_View_Noti
+	S2C_Players_Leave_View_Noti
 */
 package msg
 
@@ -63,10 +72,19 @@ const (
 	// 同步角色
 	EMsg_C2S_Sync_Player_Req_ID EMsg = 11
 	EMsg_S2C_Sync_Player_Res_ID EMsg = 12
-	// 更新位置
-	EMsg_C2S_Move_Req_ID EMsg = 13
+	// 更新位置和动作
+	EMsg_C2S_Move_And_Action_Req_ID EMsg = 17
+	EMsg_S2C_Move_And_Action_Res_ID EMsg = 18
+	// 聊天消息
+	EMsg_C2S_Talk_Req_ID EMsg = 19
+	EMsg_S2C_Talk_Res_ID EMsg = 20
 	// 广播消息
-	EMsg_S2C_Broad_Cast_ID EMsg = 65280
+	EMsg_S2C_Player_Talk_Noti_ID            EMsg = 65537
+	EMsg_S2C_Player_Move_And_Action_Noti_ID EMsg = 65538
+	EMsg_S2C_Sync_Player_Noti_ID            EMsg = 65539
+	EMsg_S2C_Sync_Players_Noti_ID           EMsg = 65540
+	EMsg_S2C_Player_Leave_View_Noti_ID      EMsg = 65541
+	EMsg_S2C_Players_Leave_View_Noti_ID     EMsg = 65542
 )
 
 var EMsg_name = map[int32]string{
@@ -82,24 +100,40 @@ var EMsg_name = map[int32]string{
 	10:    "S2C_Enter_World_Res_ID",
 	11:    "C2S_Sync_Player_Req_ID",
 	12:    "S2C_Sync_Player_Res_ID",
-	13:    "C2S_Move_Req_ID",
-	65280: "S2C_Broad_Cast_ID",
+	17:    "C2S_Move_And_Action_Req_ID",
+	18:    "S2C_Move_And_Action_Res_ID",
+	19:    "C2S_Talk_Req_ID",
+	20:    "S2C_Talk_Res_ID",
+	65537: "S2C_Player_Talk_Noti_ID",
+	65538: "S2C_Player_Move_And_Action_Noti_ID",
+	65539: "S2C_Sync_Player_Noti_ID",
+	65540: "S2C_Sync_Players_Noti_ID",
+	65541: "S2C_Player_Leave_View_Noti_ID",
+	65542: "S2C_Players_Leave_View_Noti_ID",
 }
 var EMsg_value = map[string]int32{
-	"C2S_Register_Req_ID":    1,
-	"S2C_Register_Res_ID":    2,
-	"C2S_Login_Req_ID":       3,
-	"S2C_Login_Res_ID":       4,
-	"C2S_Logout_Req_ID":      5,
-	"S2C_Logout_Res_ID":      6,
-	"C2S_Create_Char_Req_ID": 7,
-	"S2C_Create_Char_Res_ID": 8,
-	"C2S_Enter_World_Req_ID": 9,
-	"S2C_Enter_World_Res_ID": 10,
-	"C2S_Sync_Player_Req_ID": 11,
-	"S2C_Sync_Player_Res_ID": 12,
-	"C2S_Move_Req_ID":        13,
-	"S2C_Broad_Cast_ID":      65280,
+	"C2S_Register_Req_ID":                1,
+	"S2C_Register_Res_ID":                2,
+	"C2S_Login_Req_ID":                   3,
+	"S2C_Login_Res_ID":                   4,
+	"C2S_Logout_Req_ID":                  5,
+	"S2C_Logout_Res_ID":                  6,
+	"C2S_Create_Char_Req_ID":             7,
+	"S2C_Create_Char_Res_ID":             8,
+	"C2S_Enter_World_Req_ID":             9,
+	"S2C_Enter_World_Res_ID":             10,
+	"C2S_Sync_Player_Req_ID":             11,
+	"S2C_Sync_Player_Res_ID":             12,
+	"C2S_Move_And_Action_Req_ID":         17,
+	"S2C_Move_And_Action_Res_ID":         18,
+	"C2S_Talk_Req_ID":                    19,
+	"S2C_Talk_Res_ID":                    20,
+	"S2C_Player_Talk_Noti_ID":            65537,
+	"S2C_Player_Move_And_Action_Noti_ID": 65538,
+	"S2C_Sync_Player_Noti_ID":            65539,
+	"S2C_Sync_Players_Noti_ID":           65540,
+	"S2C_Player_Leave_View_Noti_ID":      65541,
+	"S2C_Players_Leave_View_Noti_ID":     65542,
 }
 
 func (x EMsg) Enum() *EMsg {
@@ -120,45 +154,24 @@ func (x *EMsg) UnmarshalJSON(data []byte) error {
 }
 func (EMsg) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-// 广播消息类型
-type EBC int32
-
-const (
-	EBC_Talk   EBC = 1
-	EBC_Sync   EBC = 2
-	EBC_Action EBC = 3
-)
-
-var EBC_name = map[int32]string{
-	1: "Talk",
-	2: "Sync",
-	3: "Action",
-}
-var EBC_value = map[string]int32{
-	"Talk":   1,
-	"Sync":   2,
-	"Action": 3,
+// 基础消息类型
+type Players struct {
+	Players          []*Player `protobuf:"bytes,1,rep,name=players" json:"players,omitempty"`
+	XXX_unrecognized []byte    `json:"-"`
 }
 
-func (x EBC) Enum() *EBC {
-	p := new(EBC)
-	*p = x
-	return p
-}
-func (x EBC) String() string {
-	return proto.EnumName(EBC_name, int32(x))
-}
-func (x *EBC) UnmarshalJSON(data []byte) error {
-	value, err := proto.UnmarshalJSONEnum(EBC_value, data, "EBC")
-	if err != nil {
-		return err
+func (m *Players) Reset()                    { *m = Players{} }
+func (m *Players) String() string            { return proto.CompactTextString(m) }
+func (*Players) ProtoMessage()               {}
+func (*Players) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+
+func (m *Players) GetPlayers() []*Player {
+	if m != nil {
+		return m.Players
 	}
-	*x = EBC(value)
 	return nil
 }
-func (EBC) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
-// 基础消息类型
 type Player struct {
 	Pid              *int32    `protobuf:"varint,1,opt,name=pid" json:"pid,omitempty"`
 	Pos              *Position `protobuf:"bytes,2,opt,name=pos" json:"pos,omitempty"`
@@ -168,7 +181,7 @@ type Player struct {
 func (m *Player) Reset()                    { *m = Player{} }
 func (m *Player) String() string            { return proto.CompactTextString(m) }
 func (*Player) ProtoMessage()               {}
-func (*Player) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (*Player) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
 func (m *Player) GetPid() int32 {
 	if m != nil && m.Pid != nil {
@@ -195,7 +208,7 @@ type Position struct {
 func (m *Position) Reset()                    { *m = Position{} }
 func (m *Position) String() string            { return proto.CompactTextString(m) }
 func (*Position) ProtoMessage()               {}
-func (*Position) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+func (*Position) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
 
 func (m *Position) GetX() float32 {
 	if m != nil && m.X != nil {
@@ -225,6 +238,7 @@ func (m *Position) GetV() float32 {
 	return 0
 }
 
+// 请求回复消息
 type C2S_Register_Req struct {
 	UserName         *string `protobuf:"bytes,1,opt,name=userName" json:"userName,omitempty"`
 	Password         *string `protobuf:"bytes,2,opt,name=password" json:"password,omitempty"`
@@ -234,7 +248,7 @@ type C2S_Register_Req struct {
 func (m *C2S_Register_Req) Reset()                    { *m = C2S_Register_Req{} }
 func (m *C2S_Register_Req) String() string            { return proto.CompactTextString(m) }
 func (*C2S_Register_Req) ProtoMessage()               {}
-func (*C2S_Register_Req) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+func (*C2S_Register_Req) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
 
 func (m *C2S_Register_Req) GetUserName() string {
 	if m != nil && m.UserName != nil {
@@ -260,7 +274,7 @@ type S2C_Register_Res struct {
 func (m *S2C_Register_Res) Reset()                    { *m = S2C_Register_Res{} }
 func (m *S2C_Register_Res) String() string            { return proto.CompactTextString(m) }
 func (*S2C_Register_Res) ProtoMessage()               {}
-func (*S2C_Register_Res) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+func (*S2C_Register_Res) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
 
 func (m *S2C_Register_Res) GetResult() bool {
 	if m != nil && m.Result != nil {
@@ -292,7 +306,7 @@ type C2S_Login_Req struct {
 func (m *C2S_Login_Req) Reset()                    { *m = C2S_Login_Req{} }
 func (m *C2S_Login_Req) String() string            { return proto.CompactTextString(m) }
 func (*C2S_Login_Req) ProtoMessage()               {}
-func (*C2S_Login_Req) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+func (*C2S_Login_Req) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
 
 func (m *C2S_Login_Req) GetUserName() string {
 	if m != nil && m.UserName != nil {
@@ -318,7 +332,7 @@ type S2C_Login_Res struct {
 func (m *S2C_Login_Res) Reset()                    { *m = S2C_Login_Res{} }
 func (m *S2C_Login_Res) String() string            { return proto.CompactTextString(m) }
 func (*S2C_Login_Res) ProtoMessage()               {}
-func (*S2C_Login_Res) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
+func (*S2C_Login_Res) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
 
 func (m *S2C_Login_Res) GetResult() bool {
 	if m != nil && m.Result != nil {
@@ -348,7 +362,7 @@ type C2S_Logout_Req struct {
 func (m *C2S_Logout_Req) Reset()                    { *m = C2S_Logout_Req{} }
 func (m *C2S_Logout_Req) String() string            { return proto.CompactTextString(m) }
 func (*C2S_Logout_Req) ProtoMessage()               {}
-func (*C2S_Logout_Req) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
+func (*C2S_Logout_Req) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
 
 type S2C_Logout_Res struct {
 	Result           *bool   `protobuf:"varint,1,opt,name=result" json:"result,omitempty"`
@@ -360,7 +374,7 @@ type S2C_Logout_Res struct {
 func (m *S2C_Logout_Res) Reset()                    { *m = S2C_Logout_Res{} }
 func (m *S2C_Logout_Res) String() string            { return proto.CompactTextString(m) }
 func (*S2C_Logout_Res) ProtoMessage()               {}
-func (*S2C_Logout_Res) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
+func (*S2C_Logout_Res) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
 
 func (m *S2C_Logout_Res) GetResult() bool {
 	if m != nil && m.Result != nil {
@@ -392,7 +406,7 @@ type C2S_Create_Char_Req struct {
 func (m *C2S_Create_Char_Req) Reset()                    { *m = C2S_Create_Char_Req{} }
 func (m *C2S_Create_Char_Req) String() string            { return proto.CompactTextString(m) }
 func (*C2S_Create_Char_Req) ProtoMessage()               {}
-func (*C2S_Create_Char_Req) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
+func (*C2S_Create_Char_Req) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
 
 func (m *C2S_Create_Char_Req) GetCharType() int32 {
 	if m != nil && m.CharType != nil {
@@ -421,7 +435,7 @@ type S2C_Create_Char_Res struct {
 func (m *S2C_Create_Char_Res) Reset()                    { *m = S2C_Create_Char_Res{} }
 func (m *S2C_Create_Char_Res) String() string            { return proto.CompactTextString(m) }
 func (*S2C_Create_Char_Res) ProtoMessage()               {}
-func (*S2C_Create_Char_Res) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
+func (*S2C_Create_Char_Res) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{10} }
 
 func (m *S2C_Create_Char_Res) GetResult() bool {
 	if m != nil && m.Result != nil {
@@ -473,7 +487,7 @@ type C2S_Enter_World_Req struct {
 func (m *C2S_Enter_World_Req) Reset()                    { *m = C2S_Enter_World_Req{} }
 func (m *C2S_Enter_World_Req) String() string            { return proto.CompactTextString(m) }
 func (*C2S_Enter_World_Req) ProtoMessage()               {}
-func (*C2S_Enter_World_Req) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{10} }
+func (*C2S_Enter_World_Req) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
 
 func (m *C2S_Enter_World_Req) GetPid() int32 {
 	if m != nil && m.Pid != nil {
@@ -493,7 +507,7 @@ type S2C_Enter_World_Res struct {
 func (m *S2C_Enter_World_Res) Reset()                    { *m = S2C_Enter_World_Res{} }
 func (m *S2C_Enter_World_Res) String() string            { return proto.CompactTextString(m) }
 func (*S2C_Enter_World_Res) ProtoMessage()               {}
-func (*S2C_Enter_World_Res) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
+func (*S2C_Enter_World_Res) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{12} }
 
 func (m *S2C_Enter_World_Res) GetResult() bool {
 	if m != nil && m.Result != nil {
@@ -531,7 +545,7 @@ type C2S_Sync_Player_Req struct {
 func (m *C2S_Sync_Player_Req) Reset()                    { *m = C2S_Sync_Player_Req{} }
 func (m *C2S_Sync_Player_Req) String() string            { return proto.CompactTextString(m) }
 func (*C2S_Sync_Player_Req) ProtoMessage()               {}
-func (*C2S_Sync_Player_Req) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{12} }
+func (*C2S_Sync_Player_Req) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
 
 func (m *C2S_Sync_Player_Req) GetPid() int32 {
 	if m != nil && m.Pid != nil {
@@ -548,7 +562,7 @@ type S2C_Sync_Player_Res struct {
 func (m *S2C_Sync_Player_Res) Reset()                    { *m = S2C_Sync_Player_Res{} }
 func (m *S2C_Sync_Player_Res) String() string            { return proto.CompactTextString(m) }
 func (*S2C_Sync_Player_Res) ProtoMessage()               {}
-func (*S2C_Sync_Player_Res) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
+func (*S2C_Sync_Player_Res) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{14} }
 
 func (m *S2C_Sync_Player_Res) GetPlayer() *Player {
 	if m != nil {
@@ -557,192 +571,196 @@ func (m *S2C_Sync_Player_Res) GetPlayer() *Player {
 	return nil
 }
 
-type C2S_Move_Req struct {
+type C2S_Move_And_Action_Req struct {
 	Pos              *Position `protobuf:"bytes,1,opt,name=pos" json:"pos,omitempty"`
 	Action           *int32    `protobuf:"varint,2,opt,name=action" json:"action,omitempty"`
 	XXX_unrecognized []byte    `json:"-"`
 }
 
-func (m *C2S_Move_Req) Reset()                    { *m = C2S_Move_Req{} }
-func (m *C2S_Move_Req) String() string            { return proto.CompactTextString(m) }
-func (*C2S_Move_Req) ProtoMessage()               {}
-func (*C2S_Move_Req) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{14} }
+func (m *C2S_Move_And_Action_Req) Reset()                    { *m = C2S_Move_And_Action_Req{} }
+func (m *C2S_Move_And_Action_Req) String() string            { return proto.CompactTextString(m) }
+func (*C2S_Move_And_Action_Req) ProtoMessage()               {}
+func (*C2S_Move_And_Action_Req) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{15} }
 
-func (m *C2S_Move_Req) GetPos() *Position {
+func (m *C2S_Move_And_Action_Req) GetPos() *Position {
 	if m != nil {
 		return m.Pos
 	}
 	return nil
 }
 
-func (m *C2S_Move_Req) GetAction() int32 {
+func (m *C2S_Move_And_Action_Req) GetAction() int32 {
 	if m != nil && m.Action != nil {
 		return *m.Action
 	}
 	return 0
 }
 
-type BroadCast struct {
-	Pid *int32 `protobuf:"varint,1,opt,name=Pid" json:"Pid,omitempty"`
-	Tp  *int32 `protobuf:"varint,2,opt,name=Tp" json:"Tp,omitempty"`
-	// Types that are valid to be assigned to Data:
-	//	*BroadCast_Content
-	//	*BroadCast_Pos
-	//	*BroadCast_Action
-	Data             isBroadCast_Data `protobuf_oneof:"Data"`
-	XXX_unrecognized []byte           `json:"-"`
+type S2C_Move_And_Action_Res struct {
+	XXX_unrecognized []byte `json:"-"`
 }
 
-func (m *BroadCast) Reset()                    { *m = BroadCast{} }
-func (m *BroadCast) String() string            { return proto.CompactTextString(m) }
-func (*BroadCast) ProtoMessage()               {}
-func (*BroadCast) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{15} }
+func (m *S2C_Move_And_Action_Res) Reset()                    { *m = S2C_Move_And_Action_Res{} }
+func (m *S2C_Move_And_Action_Res) String() string            { return proto.CompactTextString(m) }
+func (*S2C_Move_And_Action_Res) ProtoMessage()               {}
+func (*S2C_Move_And_Action_Res) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{16} }
 
-type isBroadCast_Data interface {
-	isBroadCast_Data()
+type C2S_Talk_Req struct {
+	Context          *string `protobuf:"bytes,1,opt,name=context" json:"context,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
 }
 
-type BroadCast_Content struct {
-	Content string `protobuf:"bytes,3,opt,name=content,oneof"`
-}
-type BroadCast_Pos struct {
-	Pos *Position `protobuf:"bytes,4,opt,name=pos,oneof"`
-}
-type BroadCast_Action struct {
-	Action int32 `protobuf:"varint,5,opt,name=action,oneof"`
-}
+func (m *C2S_Talk_Req) Reset()                    { *m = C2S_Talk_Req{} }
+func (m *C2S_Talk_Req) String() string            { return proto.CompactTextString(m) }
+func (*C2S_Talk_Req) ProtoMessage()               {}
+func (*C2S_Talk_Req) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{17} }
 
-func (*BroadCast_Content) isBroadCast_Data() {}
-func (*BroadCast_Pos) isBroadCast_Data()     {}
-func (*BroadCast_Action) isBroadCast_Data()  {}
-
-func (m *BroadCast) GetData() isBroadCast_Data {
-	if m != nil {
-		return m.Data
+func (m *C2S_Talk_Req) GetContext() string {
+	if m != nil && m.Context != nil {
+		return *m.Context
 	}
-	return nil
+	return ""
 }
 
-func (m *BroadCast) GetPid() int32 {
+type S2C_Talk_Res struct {
+	XXX_unrecognized []byte `json:"-"`
+}
+
+func (m *S2C_Talk_Res) Reset()                    { *m = S2C_Talk_Res{} }
+func (m *S2C_Talk_Res) String() string            { return proto.CompactTextString(m) }
+func (*S2C_Talk_Res) ProtoMessage()               {}
+func (*S2C_Talk_Res) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{18} }
+
+type S2C_Player_Talk_Noti struct {
+	Pid              *int32  `protobuf:"varint,1,opt,name=pid" json:"pid,omitempty"`
+	Context          *string `protobuf:"bytes,2,opt,name=context" json:"context,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *S2C_Player_Talk_Noti) Reset()                    { *m = S2C_Player_Talk_Noti{} }
+func (m *S2C_Player_Talk_Noti) String() string            { return proto.CompactTextString(m) }
+func (*S2C_Player_Talk_Noti) ProtoMessage()               {}
+func (*S2C_Player_Talk_Noti) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{19} }
+
+func (m *S2C_Player_Talk_Noti) GetPid() int32 {
 	if m != nil && m.Pid != nil {
 		return *m.Pid
 	}
 	return 0
 }
 
-func (m *BroadCast) GetTp() int32 {
-	if m != nil && m.Tp != nil {
-		return *m.Tp
-	}
-	return 0
-}
-
-func (m *BroadCast) GetContent() string {
-	if x, ok := m.GetData().(*BroadCast_Content); ok {
-		return x.Content
+func (m *S2C_Player_Talk_Noti) GetContext() string {
+	if m != nil && m.Context != nil {
+		return *m.Context
 	}
 	return ""
 }
 
-func (m *BroadCast) GetPos() *Position {
-	if x, ok := m.GetData().(*BroadCast_Pos); ok {
-		return x.Pos
-	}
-	return nil
+type S2C_Player_Move_And_Action_Noti struct {
+	Pid              *int32    `protobuf:"varint,1,opt,name=pid" json:"pid,omitempty"`
+	Pos              *Position `protobuf:"bytes,2,opt,name=pos" json:"pos,omitempty"`
+	Action           *int32    `protobuf:"varint,3,opt,name=action" json:"action,omitempty"`
+	XXX_unrecognized []byte    `json:"-"`
 }
 
-func (m *BroadCast) GetAction() int32 {
-	if x, ok := m.GetData().(*BroadCast_Action); ok {
-		return x.Action
+func (m *S2C_Player_Move_And_Action_Noti) Reset()         { *m = S2C_Player_Move_And_Action_Noti{} }
+func (m *S2C_Player_Move_And_Action_Noti) String() string { return proto.CompactTextString(m) }
+func (*S2C_Player_Move_And_Action_Noti) ProtoMessage()    {}
+func (*S2C_Player_Move_And_Action_Noti) Descriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{20}
+}
+
+func (m *S2C_Player_Move_And_Action_Noti) GetPid() int32 {
+	if m != nil && m.Pid != nil {
+		return *m.Pid
 	}
 	return 0
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*BroadCast) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _BroadCast_OneofMarshaler, _BroadCast_OneofUnmarshaler, _BroadCast_OneofSizer, []interface{}{
-		(*BroadCast_Content)(nil),
-		(*BroadCast_Pos)(nil),
-		(*BroadCast_Action)(nil),
-	}
-}
-
-func _BroadCast_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*BroadCast)
-	// Data
-	switch x := m.Data.(type) {
-	case *BroadCast_Content:
-		b.EncodeVarint(3<<3 | proto.WireBytes)
-		b.EncodeStringBytes(x.Content)
-	case *BroadCast_Pos:
-		b.EncodeVarint(4<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Pos); err != nil {
-			return err
-		}
-	case *BroadCast_Action:
-		b.EncodeVarint(5<<3 | proto.WireVarint)
-		b.EncodeVarint(uint64(x.Action))
-	case nil:
-	default:
-		return fmt.Errorf("BroadCast.Data has unexpected type %T", x)
+func (m *S2C_Player_Move_And_Action_Noti) GetPos() *Position {
+	if m != nil {
+		return m.Pos
 	}
 	return nil
 }
 
-func _BroadCast_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*BroadCast)
-	switch tag {
-	case 3: // Data.content
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeStringBytes()
-		m.Data = &BroadCast_Content{x}
-		return true, err
-	case 4: // Data.pos
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(Position)
-		err := b.DecodeMessage(msg)
-		m.Data = &BroadCast_Pos{msg}
-		return true, err
-	case 5: // Data.action
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.Data = &BroadCast_Action{int32(x)}
-		return true, err
-	default:
-		return false, nil
+func (m *S2C_Player_Move_And_Action_Noti) GetAction() int32 {
+	if m != nil && m.Action != nil {
+		return *m.Action
 	}
+	return 0
 }
 
-func _BroadCast_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*BroadCast)
-	// Data
-	switch x := m.Data.(type) {
-	case *BroadCast_Content:
-		n += proto.SizeVarint(3<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(len(x.Content)))
-		n += len(x.Content)
-	case *BroadCast_Pos:
-		s := proto.Size(x.Pos)
-		n += proto.SizeVarint(4<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *BroadCast_Action:
-		n += proto.SizeVarint(5<<3 | proto.WireVarint)
-		n += proto.SizeVarint(uint64(x.Action))
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
+type S2C_Sync_Player_Noti struct {
+	Player           *Player `protobuf:"bytes,1,opt,name=player" json:"player,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *S2C_Sync_Player_Noti) Reset()                    { *m = S2C_Sync_Player_Noti{} }
+func (m *S2C_Sync_Player_Noti) String() string            { return proto.CompactTextString(m) }
+func (*S2C_Sync_Player_Noti) ProtoMessage()               {}
+func (*S2C_Sync_Player_Noti) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{21} }
+
+func (m *S2C_Sync_Player_Noti) GetPlayer() *Player {
+	if m != nil {
+		return m.Player
 	}
-	return n
+	return nil
+}
+
+type S2C_Sync_Players_Noti struct {
+	Players          []*Player `protobuf:"bytes,1,rep,name=players" json:"players,omitempty"`
+	XXX_unrecognized []byte    `json:"-"`
+}
+
+func (m *S2C_Sync_Players_Noti) Reset()                    { *m = S2C_Sync_Players_Noti{} }
+func (m *S2C_Sync_Players_Noti) String() string            { return proto.CompactTextString(m) }
+func (*S2C_Sync_Players_Noti) ProtoMessage()               {}
+func (*S2C_Sync_Players_Noti) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{22} }
+
+func (m *S2C_Sync_Players_Noti) GetPlayers() []*Player {
+	if m != nil {
+		return m.Players
+	}
+	return nil
+}
+
+type S2C_Player_Leave_View_Noti struct {
+	Pid              *int32 `protobuf:"varint,1,opt,name=pid" json:"pid,omitempty"`
+	XXX_unrecognized []byte `json:"-"`
+}
+
+func (m *S2C_Player_Leave_View_Noti) Reset()                    { *m = S2C_Player_Leave_View_Noti{} }
+func (m *S2C_Player_Leave_View_Noti) String() string            { return proto.CompactTextString(m) }
+func (*S2C_Player_Leave_View_Noti) ProtoMessage()               {}
+func (*S2C_Player_Leave_View_Noti) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{23} }
+
+func (m *S2C_Player_Leave_View_Noti) GetPid() int32 {
+	if m != nil && m.Pid != nil {
+		return *m.Pid
+	}
+	return 0
+}
+
+type S2C_Players_Leave_View_Noti struct {
+	Pids             []int32 `protobuf:"varint,2,rep,name=pids" json:"pids,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *S2C_Players_Leave_View_Noti) Reset()                    { *m = S2C_Players_Leave_View_Noti{} }
+func (m *S2C_Players_Leave_View_Noti) String() string            { return proto.CompactTextString(m) }
+func (*S2C_Players_Leave_View_Noti) ProtoMessage()               {}
+func (*S2C_Players_Leave_View_Noti) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{24} }
+
+func (m *S2C_Players_Leave_View_Noti) GetPids() []int32 {
+	if m != nil {
+		return m.Pids
+	}
+	return nil
 }
 
 func init() {
+	proto.RegisterType((*Players)(nil), "msg.Players")
 	proto.RegisterType((*Player)(nil), "msg.Player")
 	proto.RegisterType((*Position)(nil), "msg.Position")
 	proto.RegisterType((*C2S_Register_Req)(nil), "msg.C2S_Register_Req")
@@ -757,56 +775,71 @@ func init() {
 	proto.RegisterType((*S2C_Enter_World_Res)(nil), "msg.S2C_Enter_World_Res")
 	proto.RegisterType((*C2S_Sync_Player_Req)(nil), "msg.C2S_Sync_Player_Req")
 	proto.RegisterType((*S2C_Sync_Player_Res)(nil), "msg.S2C_Sync_Player_Res")
-	proto.RegisterType((*C2S_Move_Req)(nil), "msg.C2S_Move_Req")
-	proto.RegisterType((*BroadCast)(nil), "msg.BroadCast")
+	proto.RegisterType((*C2S_Move_And_Action_Req)(nil), "msg.C2S_Move_And_Action_Req")
+	proto.RegisterType((*S2C_Move_And_Action_Res)(nil), "msg.S2C_Move_And_Action_Res")
+	proto.RegisterType((*C2S_Talk_Req)(nil), "msg.C2S_Talk_Req")
+	proto.RegisterType((*S2C_Talk_Res)(nil), "msg.S2C_Talk_Res")
+	proto.RegisterType((*S2C_Player_Talk_Noti)(nil), "msg.S2C_Player_Talk_Noti")
+	proto.RegisterType((*S2C_Player_Move_And_Action_Noti)(nil), "msg.S2C_Player_Move_And_Action_Noti")
+	proto.RegisterType((*S2C_Sync_Player_Noti)(nil), "msg.S2C_Sync_Player_Noti")
+	proto.RegisterType((*S2C_Sync_Players_Noti)(nil), "msg.S2C_Sync_Players_Noti")
+	proto.RegisterType((*S2C_Player_Leave_View_Noti)(nil), "msg.S2C_Player_Leave_View_Noti")
+	proto.RegisterType((*S2C_Players_Leave_View_Noti)(nil), "msg.S2C_Players_Leave_View_Noti")
 	proto.RegisterEnum("msg.EMsg", EMsg_name, EMsg_value)
-	proto.RegisterEnum("msg.EBC", EBC_name, EBC_value)
 }
 
 func init() { proto.RegisterFile("msg.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 667 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x54, 0xcf, 0x4e, 0xdb, 0x4e,
-	0x10, 0xc6, 0x7f, 0x62, 0xe2, 0x09, 0xe1, 0xe7, 0xdf, 0xd2, 0x42, 0x84, 0x2a, 0x95, 0xba, 0xaa,
-	0x8a, 0x38, 0x70, 0xc8, 0xb1, 0x3d, 0x35, 0x06, 0x01, 0x55, 0xa9, 0xa2, 0x4d, 0x44, 0x81, 0x4b,
-	0xb4, 0xc4, 0xab, 0x10, 0x35, 0x64, 0xdd, 0x5d, 0xd3, 0x2a, 0xb7, 0x3e, 0x41, 0x1f, 0xa4, 0x2f,
-	0xd0, 0x57, 0xea, 0x53, 0x54, 0xd5, 0xec, 0xae, 0x0d, 0x0e, 0xe1, 0x54, 0xe5, 0xe6, 0xef, 0xfb,
-	0x3c, 0x33, 0xdf, 0xce, 0xce, 0x0e, 0x84, 0x37, 0x6a, 0xb4, 0x9f, 0x49, 0x91, 0x0b, 0xe2, 0xdd,
-	0xa8, 0x51, 0xfc, 0x16, 0x82, 0xee, 0x84, 0xcd, 0xb8, 0x24, 0x11, 0x78, 0xd9, 0x38, 0x6d, 0x39,
-	0x3b, 0xce, 0x6e, 0x8d, 0xe2, 0x27, 0x79, 0x0e, 0x5e, 0x26, 0x54, 0xcb, 0xdd, 0x71, 0x76, 0x1b,
-	0xed, 0xe6, 0x3e, 0x46, 0x76, 0x85, 0x1a, 0xe7, 0x63, 0x31, 0xa5, 0xa8, 0xc4, 0x1d, 0xa8, 0x17,
-	0x04, 0x59, 0x03, 0xe7, 0x5c, 0x07, 0xbb, 0xd4, 0x39, 0x47, 0x74, 0xa1, 0x03, 0x5d, 0xea, 0x5c,
-	0x20, 0xba, 0x6c, 0x79, 0x06, 0x5d, 0x22, 0x3a, 0x6b, 0xf9, 0x06, 0x9d, 0xc5, 0xef, 0x21, 0x4a,
-	0xda, 0xbd, 0x01, 0xe5, 0xa3, 0xb1, 0xca, 0xb9, 0x1c, 0x50, 0xfe, 0x85, 0x6c, 0x43, 0xfd, 0x56,
-	0x71, 0xf9, 0x91, 0xdd, 0x70, 0x9d, 0x32, 0xa4, 0x25, 0x46, 0x2d, 0x63, 0x4a, 0x7d, 0x13, 0x32,
-	0xd5, 0x05, 0x42, 0x5a, 0xe2, 0x38, 0x85, 0xa8, 0xd7, 0x4e, 0xee, 0xe7, 0x52, 0x64, 0x13, 0x02,
-	0xc9, 0xd5, 0xed, 0x24, 0xd7, 0x99, 0xea, 0xd4, 0x22, 0xf2, 0x0c, 0x42, 0x2e, 0xa5, 0x90, 0x89,
-	0x48, 0xb9, 0x4e, 0x54, 0xa3, 0x77, 0x04, 0x56, 0xd1, 0xa0, 0x97, 0x4b, 0x6d, 0x3c, 0xa4, 0x25,
-	0x8e, 0x8f, 0xa0, 0x89, 0x8e, 0x3f, 0x88, 0xd1, 0x78, 0xfa, 0x4f, 0x76, 0x19, 0x34, 0xd1, 0x6e,
-	0x91, 0x68, 0x19, 0x5e, 0x23, 0x58, 0xb7, 0x5e, 0xc5, 0x6d, 0x8e, 0x66, 0xe3, 0x2b, 0x58, 0xb7,
-	0x45, 0x0d, 0xb3, 0x8c, 0xaa, 0xa7, 0xb0, 0x81, 0x55, 0x13, 0xc9, 0x59, 0xce, 0x07, 0xc9, 0x35,
-	0x2b, 0xaf, 0x75, 0x78, 0xcd, 0x64, 0x7f, 0x96, 0x71, 0x3b, 0x66, 0x25, 0x46, 0x4d, 0x8a, 0x09,
-	0xd7, 0x3d, 0xb4, 0x7d, 0x2a, 0x70, 0xfc, 0xcb, 0x81, 0x0d, 0xf4, 0x5c, 0xcd, 0xb7, 0x04, 0xe3,
-	0x3a, 0xa3, 0x98, 0xf0, 0x93, 0x54, 0xcf, 0x67, 0x8d, 0x5a, 0x54, 0x71, 0x5e, 0x7b, 0xe8, 0x1c,
-	0xbf, 0xb5, 0xf3, 0xc0, 0xe4, 0x2b, 0x70, 0xfc, 0xda, 0x34, 0xe2, 0x70, 0x8a, 0xd3, 0xf8, 0x49,
-	0xc8, 0x49, 0xaa, 0x1b, 0xf1, 0xe0, 0xa9, 0xc5, 0x33, 0x73, 0xc2, 0xea, 0x8f, 0xcb, 0x38, 0xa1,
-	0x2d, 0xed, 0xdf, 0x95, 0xb6, 0x1e, 0x7b, 0xb3, 0xe9, 0x70, 0x60, 0x56, 0xc1, 0x23, 0x1e, 0xdf,
-	0x18, 0x8f, 0xd5, 0x1f, 0x15, 0x79, 0x09, 0x41, 0xa6, 0x91, 0xfe, 0xb7, 0xd1, 0x6e, 0x98, 0x45,
-	0xa1, 0x29, 0x6a, 0xa5, 0xf8, 0x08, 0xd6, 0xb0, 0xc8, 0xa9, 0xf8, 0xca, 0x75, 0x76, 0xbb, 0x5a,
-	0x9c, 0xc7, 0x56, 0x0b, 0x9e, 0x9c, 0x0d, 0x11, 0xda, 0xe3, 0x59, 0x14, 0xff, 0x70, 0x20, 0xec,
-	0x48, 0xc1, 0xd2, 0x84, 0xa9, 0x1c, 0x4d, 0x76, 0xef, 0x4c, 0x76, 0xc7, 0x29, 0x59, 0x07, 0xb7,
-	0x9f, 0xd9, 0x18, 0xb7, 0x9f, 0x91, 0x6d, 0x58, 0x1d, 0x8a, 0x69, 0xce, 0xa7, 0xb9, 0x69, 0xc5,
-	0xf1, 0x0a, 0x2d, 0x08, 0xf2, 0xc2, 0x98, 0xf0, 0x17, 0x98, 0x38, 0x5e, 0x31, 0x36, 0x5a, 0xa5,
-	0x0d, 0x7d, 0xed, 0xc7, 0x2b, 0x85, 0x91, 0x4e, 0x00, 0xfe, 0x01, 0xcb, 0xd9, 0xde, 0x6f, 0x17,
-	0xfc, 0xc3, 0x53, 0x35, 0x22, 0x5b, 0xa6, 0x8f, 0xf7, 0x17, 0xd9, 0xe0, 0xe4, 0x20, 0x72, 0x50,
-	0x98, 0xdf, 0x4a, 0x28, 0xb8, 0xe4, 0x89, 0x59, 0x7d, 0xe5, 0x22, 0x41, 0xd6, 0x43, 0xb6, 0xb2,
-	0x15, 0x90, 0xf5, 0xc9, 0x53, 0xf8, 0xbf, 0xfa, 0x90, 0x91, 0xae, 0x21, 0x5d, 0x7d, 0xcd, 0x48,
-	0x07, 0x64, 0x1b, 0x36, 0x17, 0x3c, 0x40, 0xd4, 0x56, 0x51, 0x5b, 0xf0, 0x98, 0x50, 0xab, 0x17,
-	0x71, 0x73, 0xf3, 0x8a, 0x5a, 0x58, 0xc4, 0xcd, 0x8d, 0x28, 0x6a, 0x50, 0xc4, 0xcd, 0xcd, 0x10,
-	0x6a, 0x8d, 0x22, 0x6e, 0x6e, 0x6c, 0x50, 0x5b, 0x23, 0x1b, 0xf0, 0xdf, 0xfd, 0xb1, 0x40, 0xb2,
-	0x49, 0xb6, 0xcc, 0x99, 0xf4, 0x2d, 0x0f, 0xf0, 0x9a, 0x91, 0xfe, 0xfe, 0xc7, 0xdb, 0x7b, 0x05,
-	0xde, 0x61, 0x27, 0x21, 0x75, 0xf0, 0xfb, 0x6c, 0xf2, 0x39, 0x72, 0xf0, 0x0b, 0xd3, 0x46, 0x2e,
-	0x01, 0x08, 0xde, 0xe9, 0x7b, 0x89, 0xbc, 0x4e, 0xed, 0xa7, 0xeb, 0x76, 0xaf, 0xfe, 0x06, 0x00,
-	0x00, 0xff, 0xff, 0xe6, 0x89, 0xe4, 0x3d, 0xea, 0x06, 0x00, 0x00,
+	// 799 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x55, 0x5b, 0x4f, 0xe3, 0x46,
+	0x14, 0x96, 0x63, 0xe7, 0x76, 0x12, 0x68, 0x98, 0x70, 0x49, 0xd3, 0x72, 0xd1, 0xd0, 0xaa, 0x51,
+	0x1f, 0x50, 0x9b, 0xc7, 0x22, 0x55, 0x82, 0x14, 0x55, 0xac, 0x00, 0x21, 0x07, 0xb1, 0xc0, 0x8b,
+	0x65, 0xe2, 0x51, 0xb0, 0x36, 0x64, 0xb2, 0x1e, 0x03, 0x9b, 0xb7, 0xec, 0xf5, 0xc7, 0xec, 0x1f,
+	0xd8, 0x9f, 0xb6, 0xaf, 0xab, 0x33, 0x33, 0x0e, 0xb6, 0x93, 0x2c, 0x48, 0xab, 0xbc, 0xcd, 0x39,
+	0xdf, 0xb9, 0x7c, 0x33, 0x3e, 0xe7, 0x33, 0x14, 0x6f, 0x45, 0x77, 0x67, 0x10, 0xf0, 0x90, 0x13,
+	0xf3, 0x56, 0x74, 0xe9, 0x5f, 0x90, 0x3f, 0xed, 0xb9, 0x43, 0x16, 0x08, 0xf2, 0x3b, 0xe4, 0x07,
+	0xea, 0x58, 0x33, 0xb6, 0xcc, 0x46, 0xa9, 0x59, 0xda, 0xc1, 0x60, 0x05, 0xdb, 0x11, 0x46, 0x77,
+	0x21, 0xa7, 0x5c, 0xa4, 0x02, 0xe6, 0xc0, 0xf7, 0x6a, 0xc6, 0x96, 0xd1, 0xc8, 0xda, 0x78, 0x24,
+	0x9b, 0x60, 0x0e, 0xb8, 0xa8, 0x65, 0xb6, 0x8c, 0x46, 0xa9, 0xb9, 0xa0, 0xd2, 0xb9, 0xf0, 0x43,
+	0x9f, 0xf7, 0x6d, 0x44, 0xe8, 0x3e, 0x14, 0x22, 0x07, 0x29, 0x83, 0x71, 0x21, 0x93, 0x33, 0xb6,
+	0x71, 0x81, 0xd6, 0xa5, 0x4c, 0xcc, 0xd8, 0xc6, 0x25, 0x5a, 0x57, 0x35, 0x53, 0x59, 0x57, 0x68,
+	0x9d, 0xd7, 0x2c, 0x65, 0x9d, 0xd3, 0x17, 0x50, 0x69, 0x35, 0xdb, 0x8e, 0xcd, 0xba, 0xbe, 0x08,
+	0x59, 0xe0, 0xd8, 0xec, 0x35, 0xa9, 0x43, 0xe1, 0x4e, 0xb0, 0xe0, 0xc4, 0xbd, 0x65, 0xb2, 0x64,
+	0xd1, 0x1e, 0xdb, 0x88, 0x0d, 0x5c, 0x21, 0x1e, 0x78, 0xe0, 0xc9, 0x06, 0x45, 0x7b, 0x6c, 0x53,
+	0x0f, 0x2a, 0xed, 0x66, 0x2b, 0x5e, 0x4b, 0x90, 0x55, 0xc8, 0x05, 0x4c, 0xdc, 0xf5, 0x42, 0x59,
+	0xa9, 0x60, 0x6b, 0x8b, 0xfc, 0x0a, 0x45, 0x16, 0x04, 0x3c, 0x68, 0x71, 0x8f, 0xc9, 0x42, 0x59,
+	0xfb, 0xd1, 0x81, 0x5d, 0xa4, 0xd1, 0x0e, 0x03, 0x49, 0xbc, 0x68, 0x8f, 0x6d, 0xfa, 0x3f, 0x2c,
+	0x20, 0xe3, 0x23, 0xde, 0xf5, 0xfb, 0x3f, 0x44, 0xd7, 0x85, 0x05, 0xa4, 0x1b, 0x15, 0x9a, 0x07,
+	0xd7, 0x0a, 0x2c, 0x6a, 0xae, 0xfc, 0x2e, 0x44, 0xb2, 0xf4, 0x1a, 0x16, 0x75, 0x53, 0xe5, 0x99,
+	0x47, 0xd7, 0x63, 0xa8, 0x62, 0xd7, 0x56, 0xc0, 0xdc, 0x90, 0x39, 0xad, 0x1b, 0x77, 0xfc, 0x59,
+	0x3b, 0x37, 0x6e, 0x70, 0x36, 0x1c, 0x30, 0x3d, 0x66, 0x63, 0x1b, 0xb1, 0x80, 0xf7, 0x98, 0x7c,
+	0x43, 0xfd, 0x4e, 0x91, 0x4d, 0xbf, 0x18, 0x50, 0x45, 0xce, 0xc9, 0x7a, 0x73, 0x20, 0x2e, 0x2b,
+	0xf2, 0x1e, 0x3b, 0xf4, 0xe4, 0x7c, 0x66, 0x6d, 0x6d, 0x25, 0x98, 0x67, 0x27, 0x99, 0xe3, 0x59,
+	0x32, 0xcf, 0xa9, 0x7a, 0x91, 0x4d, 0xff, 0x50, 0x0f, 0x71, 0xd0, 0xc7, 0x69, 0x7c, 0xc9, 0x83,
+	0x9e, 0x27, 0x1f, 0x62, 0x62, 0xd5, 0xe8, 0x50, 0xdd, 0x30, 0x19, 0x38, 0x8f, 0x1b, 0xea, 0xd6,
+	0xd6, 0x63, 0x6b, 0xcd, 0xb1, 0x3d, 0xec, 0x77, 0x1c, 0x25, 0x05, 0x33, 0x38, 0xfe, 0xa3, 0x38,
+	0x26, 0x03, 0x05, 0xd9, 0x86, 0x9c, 0x12, 0x13, 0x19, 0x9b, 0xd2, 0x19, 0x0d, 0x51, 0x1b, 0xd6,
+	0xb0, 0xc9, 0x31, 0xbf, 0x67, 0xce, 0x5e, 0xdf, 0x73, 0xf6, 0x3a, 0x28, 0x1a, 0xb2, 0x91, 0x56,
+	0x19, 0x63, 0x96, 0xca, 0xe0, 0x23, 0xb8, 0x32, 0x5c, 0xdf, 0x54, 0x5b, 0xf4, 0x67, 0x58, 0x43,
+	0x3e, 0x93, 0x35, 0x05, 0x6d, 0x40, 0x19, 0xdb, 0x9d, 0xb9, 0xbd, 0x57, 0xb2, 0x47, 0x0d, 0xf2,
+	0x1d, 0xde, 0x0f, 0xd9, 0x9b, 0x50, 0x2f, 0x68, 0x64, 0xd2, 0x45, 0x28, 0x63, 0x11, 0x1d, 0x89,
+	0x92, 0xb6, 0x8c, 0xb6, 0xbe, 0x9f, 0x74, 0x9f, 0xf0, 0xd0, 0x9f, 0xa2, 0x8e, 0xb1, 0x9a, 0x99,
+	0x64, 0xcd, 0x1e, 0x6c, 0xc6, 0x6a, 0xa4, 0xf9, 0xcd, 0x28, 0xf7, 0x94, 0xd8, 0xc6, 0x9e, 0xc1,
+	0x4c, 0x3c, 0xc3, 0xae, 0x62, 0x1c, 0xff, 0x2c, 0xb2, 0xc5, 0xb3, 0xbe, 0xcb, 0xbf, 0xb0, 0x92,
+	0x4a, 0x16, 0x2a, 0xfb, 0x99, 0xbf, 0x8f, 0x1d, 0xa8, 0xc7, 0xae, 0x7a, 0xc4, 0xdc, 0x7b, 0xe6,
+	0x9c, 0xfb, 0xec, 0x61, 0xc6, 0x2d, 0xe9, 0xdf, 0xf0, 0xcb, 0x63, 0xbc, 0x98, 0x48, 0x20, 0x60,
+	0x0d, 0x7c, 0x0f, 0x5f, 0xc1, 0x6c, 0x64, 0x6d, 0x79, 0xfe, 0xf3, 0xab, 0x05, 0xd6, 0xc1, 0xb1,
+	0xe8, 0x92, 0x35, 0x35, 0xa8, 0xf1, 0x3f, 0x85, 0x73, 0xf8, 0x5f, 0xc5, 0x40, 0x20, 0x2d, 0xfb,
+	0x08, 0x64, 0xc8, 0xb2, 0xfa, 0xb7, 0x8c, 0x95, 0x1a, 0xbd, 0x26, 0x7a, 0x13, 0xb2, 0x8b, 0x5e,
+	0x8b, 0xac, 0xc0, 0x52, 0x52, 0x29, 0xd1, 0x9d, 0x45, 0x77, 0x52, 0x2e, 0xd1, 0x9d, 0x23, 0x75,
+	0x58, 0x9d, 0xa2, 0x70, 0x88, 0xe5, 0x11, 0x9b, 0xa2, 0x56, 0x88, 0x15, 0xa2, 0xbc, 0x94, 0x20,
+	0x20, 0x56, 0x8c, 0xf2, 0x52, 0x1a, 0x80, 0x18, 0x44, 0x79, 0xa9, 0x25, 0x45, 0xac, 0x14, 0xe5,
+	0xa5, 0xf6, 0x12, 0xb1, 0x32, 0xd9, 0x80, 0xfa, 0x8c, 0xbd, 0x43, 0x7c, 0x09, 0xf1, 0x19, 0x3b,
+	0x84, 0x38, 0x21, 0x55, 0xf8, 0x29, 0xbe, 0x48, 0xe8, 0xac, 0xa2, 0x33, 0xbe, 0x33, 0xe8, 0x5c,
+	0x26, 0xeb, 0x6a, 0x1b, 0xd3, 0x8b, 0x83, 0xe0, 0xdb, 0x91, 0x45, 0x1a, 0x40, 0x9f, 0xd8, 0x09,
+	0x8c, 0x7c, 0x37, 0xb2, 0xa2, 0x42, 0xe9, 0x79, 0x46, 0xf8, 0xfd, 0xc8, 0x22, 0x1b, 0x50, 0x9b,
+	0x3a, 0xb1, 0x88, 0x7f, 0x18, 0x59, 0x64, 0x1b, 0xd6, 0x67, 0x4f, 0x24, 0x06, 0x7d, 0x1c, 0x59,
+	0xe4, 0x37, 0xd8, 0xf8, 0xce, 0x18, 0x62, 0xd4, 0xa7, 0x91, 0xb5, 0x9f, 0xfd, 0x9c, 0xc9, 0x9c,
+	0x5e, 0x7f, 0x0b, 0x00, 0x00, 0xff, 0xff, 0x21, 0xef, 0xf6, 0xea, 0x65, 0x09, 0x00, 0x00,
 }
